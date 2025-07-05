@@ -62,6 +62,15 @@ namespace big
 			return m_Resizing;
 		}
 
+		virtual void set_fonts_updated()
+		{
+			m_FontsUpdated = true;
+		}
+		virtual void set_safe_to_render()
+		{
+			m_SafeToRender = true;
+		}
+
 	private:
 		void new_frame();
 		void end_frame();
@@ -78,7 +87,9 @@ namespace big
 		ExampleDescriptorHeapAllocator m_HeapAllocator;
 
 	private:
+		bool m_Initialized;
 		bool m_Resizing;
+		bool m_SafeToRender;
 
 		//DX12
 		std::vector<FrameContext> m_FrameContext;
@@ -98,6 +109,8 @@ namespace big
 		UINT64 m_FenceLastSignaledValue{};
 		HANDLE m_SwapchainWaitableObject{};
 		UINT64 m_FrameIndex{};
+
+		bool m_FontsUpdated;
 
 	private:
 		std::map<std::uint32_t, dx_callback> m_dx_callbacks;

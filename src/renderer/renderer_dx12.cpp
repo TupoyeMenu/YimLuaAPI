@@ -3,11 +3,12 @@
  * @brief General rendering and ImGui initialization.
  */
 
-#include "renderer/renderer.hpp"
 #ifdef ENABLE_GUI
 
 	#include "pointers.hpp"
 	#include "renderer_dx12.hpp"
+
+	#include "renderer/renderer.hpp"
 
 	#include <backends/imgui_impl_dx12.h>
 	#include <backends/imgui_impl_win32.h>
@@ -19,7 +20,11 @@ IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARA
 
 namespace big
 {
-	renderer_dx12::renderer_dx12()
+	renderer_dx12::renderer_dx12() :
+	    m_Initialized(false),
+	    m_Resizing(false),
+	    m_FontsUpdated(false),
+	    m_SafeToRender(false)
 	{
 		if (!g_pointers->m_swapchain)
 		{
@@ -83,19 +88,14 @@ namespace big
 		m_FrameContext.resize(m_SwapChainDesc.BufferCount);
 
 		D3D12_DESCRIPTOR_HEAP_DESC DescriptorDesc{D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, m_SwapChainDesc.BufferCount, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE};
-		if (const auto result =
-		        m_Device->CreateDescriptorHeap(&DescriptorDesc, __uuidof(ID3D12DescriptorHeap), (void**)&m_DescriptorHeap);
-		    result < 0)
+		if (const auto result = m_Device->CreateDescriptorHeap(&DescriptorDesc, __uuidof(ID3D12DescriptorHeap), (void**)&m_DescriptorHeap); result < 0)
 		{
 			LOG(WARNING) << "Failed to create Descriptor Heap with result: [" << result << "]";
 
 			return;
 		}
 
-		if (const auto result = m_Device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT,
-		        __uuidof(ID3D12CommandAllocator),
-		        (void**)&m_CommandAllocator);
-		    result < 0)
+		if (const auto result = m_Device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, __uuidof(ID3D12CommandAllocator), (void**)&m_CommandAllocator); result < 0)
 		{
 			LOG(WARNING) << "Failed to create primary Command Allocator with result: [" << result << "]";
 
@@ -118,13 +118,7 @@ namespace big
 			}
 		}
 
-		if (const auto result = m_Device->CreateCommandList(0,
-		        D3D12_COMMAND_LIST_TYPE_DIRECT,
-		        m_CommandAllocator,
-		        NULL,
-		        __uuidof(ID3D12GraphicsCommandList),
-		        (void**)&m_CommandList);
-		    result < 0)
+		if (const auto result = m_Device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_CommandAllocator, NULL, __uuidof(ID3D12GraphicsCommandList), (void**)&m_CommandList); result < 0)
 		{
 			LOG(WARNING) << "Failed to create Command List with result: [" << result << "]";
 
@@ -139,10 +133,7 @@ namespace big
 		}
 
 		D3D12_DESCRIPTOR_HEAP_DESC DescriptorBackbufferDesc{D3D12_DESCRIPTOR_HEAP_TYPE_RTV, m_SwapChainDesc.BufferCount, D3D12_DESCRIPTOR_HEAP_FLAG_NONE, 1};
-		if (const auto result = m_Device->CreateDescriptorHeap(&DescriptorBackbufferDesc,
-		        __uuidof(ID3D12DescriptorHeap),
-		        (void**)&m_BackbufferDescriptorHeap);
-		    result < 0)
+		if (const auto result = m_Device->CreateDescriptorHeap(&DescriptorBackbufferDesc, __uuidof(ID3D12DescriptorHeap), (void**)&m_BackbufferDescriptorHeap); result < 0)
 		{
 			LOG(WARNING) << "Failed to create Backbuffer Descriptor Heap with result: [" << result << "]";
 
@@ -189,11 +180,16 @@ namespace big
 		init_imgui_fonts();
 
 		LOG(INFO) << "DirectX 12 renderer has finished initializing.";
+
+		m_Initialized = true;
 	}
 
 	renderer_dx12::~renderer_dx12()
 	{
 		g_renderer = nullptr;
+
+		if (!m_Initialized)
+			return;
 
 		ImGui_ImplWin32_Shutdown();
 		wait_for_last_frame();
@@ -264,6 +260,9 @@ namespace big
 
 	void renderer_dx12::on_present()
 	{
+		if (!m_SafeToRender)
+			return;
+
 		new_frame();
 		for (const auto& cb : m_dx_callbacks)
 			cb.second();
@@ -320,6 +319,13 @@ namespace big
 
 	void renderer_dx12::end_frame()
 	{
+		if (m_FontsUpdated)
+		{
+			pre_reset();
+			post_reset();
+			m_FontsUpdated = false;
+		}
+
 		wait_for_next_frame();
 
 		FrameContext& CurrentFrameContext{m_FrameContext[m_SwapChain->GetCurrentBackBufferIndex()]};

@@ -43,6 +43,12 @@ namespace big
 		{
 			return false;
 		}
+		virtual void set_fonts_updated()
+		{
+		}
+		virtual void set_safe_to_render()
+		{
+		}
 
 	private:
 		static void new_frame();

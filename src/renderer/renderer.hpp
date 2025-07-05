@@ -88,6 +88,9 @@ namespace big
 		virtual ExampleDescriptorHeapAllocator* dx12_get_heap_allocator() = 0;
 		virtual bool is_resizing()                                        = 0;
 
+		virtual void set_fonts_updated()  = 0;
+		virtual void set_safe_to_render() = 0;
+
 		static void init_imgui_config()
 		{
 			auto file_path = g_file_manager.get_project_file("./imgui.ini").get_path();
@@ -104,11 +107,11 @@ namespace big
 			 */
 			io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
 			// io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;  // Enable Gamepad Controls
-			io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;     // Enable Docking
+			io.ConfigFlags |= ImGuiConfigFlags_DockingEnable; // Enable Docking
 			// io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;   // Enable Multi-Viewport / Platform Windows // broken on DX12
 		}
 
-		static void init_imgui_fonts()
+		void init_imgui_fonts()
 		{
 			auto& io = ImGui::GetIO();
 			folder windows_fonts(std::filesystem::path(std::getenv("SYSTEMROOT")) / "Fonts");
@@ -135,53 +138,13 @@ namespace big
 				ImFontConfig fnt_cfg{};
 				fnt_cfg.FontDataOwnedByAtlas = false;
 				strcpy(fnt_cfg.Name, "Fnt20px");
-
-				io.Fonts->AddFontFromMemoryTTF(const_cast<std::uint8_t*>(font_rubik),
-				    sizeof(font_rubik),
-				    20.f,
-				    &fnt_cfg,
-				    io.Fonts->GetGlyphRangesDefault());
+				
+				io.Fonts->AddFontFromMemoryTTF(const_cast<std::uint8_t*>(font_rubik), sizeof(font_rubik), 20.f, &fnt_cfg);
 				fnt_cfg.MergeMode = true;
-				io.Fonts->AddFontFromMemoryTTF(font_data.get(), font_data_size, 20.f, &fnt_cfg, io.Fonts->GetGlyphRangesChineseSimplifiedCommon());
-				io.Fonts->AddFontFromMemoryTTF(font_data.get(), font_data_size, 20.f, &fnt_cfg, io.Fonts->GetGlyphRangesCyrillic());
-				io.Fonts->Build();
+				io.Fonts->AddFontFromMemoryTTF(font_data.get(), font_data_size, 20.f, &fnt_cfg);
 			}
 
-			{
-				ImFontConfig fnt_cfg{};
-				fnt_cfg.FontDataOwnedByAtlas = false;
-				strcpy(fnt_cfg.Name, "Fnt28px");
-
-				g.window.font_title = io.Fonts->AddFontFromMemoryTTF(const_cast<std::uint8_t*>(font_rubik), sizeof(font_rubik), 28.f, &fnt_cfg);
-				fnt_cfg.MergeMode = true;
-				io.Fonts->AddFontFromMemoryTTF(font_data.get(), font_data_size, 28.f, &fnt_cfg, io.Fonts->GetGlyphRangesChineseSimplifiedCommon());
-				io.Fonts->AddFontFromMemoryTTF(font_data.get(), font_data_size, 28.f, &fnt_cfg, io.Fonts->GetGlyphRangesCyrillic());
-				io.Fonts->Build();
-			}
-
-			{
-				ImFontConfig fnt_cfg{};
-				fnt_cfg.FontDataOwnedByAtlas = false;
-				strcpy(fnt_cfg.Name, "Fnt24px");
-
-				g.window.font_sub_title = io.Fonts->AddFontFromMemoryTTF(const_cast<std::uint8_t*>(font_rubik), sizeof(font_rubik), 24.f, &fnt_cfg);
-				fnt_cfg.MergeMode = true;
-				io.Fonts->AddFontFromMemoryTTF(font_data.get(), font_data_size, 24.f, &fnt_cfg, io.Fonts->GetGlyphRangesChineseSimplifiedCommon());
-				io.Fonts->AddFontFromMemoryTTF(font_data.get(), font_data_size, 24.f, &fnt_cfg, io.Fonts->GetGlyphRangesCyrillic());
-				io.Fonts->Build();
-			}
-
-			{
-				ImFontConfig fnt_cfg{};
-				fnt_cfg.FontDataOwnedByAtlas = false;
-				strcpy(fnt_cfg.Name, "Fnt18px");
-
-				g.window.font_small = io.Fonts->AddFontFromMemoryTTF(const_cast<std::uint8_t*>(font_rubik), sizeof(font_rubik), 18.f, &fnt_cfg);
-				fnt_cfg.MergeMode = true;
-				io.Fonts->AddFontFromMemoryTTF(font_data.get(), font_data_size, 18.f, &fnt_cfg, io.Fonts->GetGlyphRangesChineseSimplifiedCommon());
-				io.Fonts->AddFontFromMemoryTTF(font_data.get(), font_data_size, 18.f, &fnt_cfg, io.Fonts->GetGlyphRangesCyrillic());
-				io.Fonts->Build();
-			}
+			set_fonts_updated();
 		}
 	};
 
