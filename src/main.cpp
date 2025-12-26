@@ -12,8 +12,6 @@
 #include "hooking/hooking.hpp"
 #include "native_hooks/native_hooks.hpp"
 #include "pointers.hpp"
-#include "renderer/renderer_dx11.hpp"
-#include "renderer/renderer_dx12.hpp"
 #include "script_mgr.hpp"
 #include "security/ObfVar.hpp"
 #include "services/script_patcher/script_patcher_service.hpp"
@@ -27,6 +25,8 @@
 #ifdef ENABLE_GUI
 	#include "gui.hpp"
 	#include "renderer/renderer.hpp"
+	#include "renderer/renderer_dx11.hpp"
+	#include "renderer/renderer_dx12.hpp"
 #endif
 
 #include <rage/gameSkeleton.hpp>
