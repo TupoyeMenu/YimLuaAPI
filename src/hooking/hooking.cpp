@@ -46,6 +46,8 @@ namespace big
 		detour_hook_helper::add<hooks::get_anticheat_initialized_hash>("GAIH", g_pointers->m_get_anticheat_initialized_hash);
 		detour_hook_helper::add<hooks::get_anticheat_initialized_hash_2>("GAIH2", g_pointers->m_get_anticheat_initialized_hash_2);
 
+		detour_hook_helper::add<hooks::game_skeleton_update>("GSU", g_pointers->m_game_skeleton_update);
+
 		detour_hook_helper::add<hooks::run_script_threads>("Script hook", (void*)g_pointers->m_run_script_threads);
 		detour_hook_helper::add<hooks::init_native_tables>("Init Native Tables", (void*)g_pointers->m_init_native_tables);
 		detour_hook_helper::add<hooks::script_vm>("Script VM", (void*)g_pointers->m_script_vm);

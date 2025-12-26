@@ -137,12 +137,8 @@ namespace big
 			m_sig_scan_memory  = ptr.add(4).add(3).rip().as<PVOID>();
 		});
 
-		main_batch.add("Game Skeleton", "48 8D 0D ? ? ? ? BA ? ? ? ? 74 05 BA ? ? ? ? E8 ? ? ? ? E8 ? ? ? ? C6 05 ? ? ? ? ? 48 8D 0D ? ? ? ? BA ? ? ? ? 84 DB 75 05 BA ? ? ? ? E8 ? ? ? ? 48 8B CD C6 05 ? ? ? ? ? E8 ? ? ? ? 84", -1, -1, eGameBranch::Legacy, [this](memory::handle ptr) {
-			m_game_skeleton = ptr.add(3).rip().as<rage::game_skeleton*>();
-		});
-
-		main_batch.add("Nullsub", "90 C3 CC", [this](memory::handle ptr) {
-			m_nullsub = ptr.as<void (*)()>();
+		main_batch.add("Game Skeleton Update", "40 53 48 83 EC 20 48 8B 81 40 01", -1, -1, eGameBranch::Legacy, [this](memory::handle ptr) {
+			m_game_skeleton_update = ptr.as<PVOID*>();
 		});
 
 		main_batch.add("Anticheat Initialized Hash", "48 83 EC 20 48 8B D9 48 8B 0D ? ? ? ? 48 85 C9 0F 84", -1, -1, eGameBranch::Legacy, [this](memory::handle ptr) {
@@ -161,8 +157,8 @@ namespace big
 			m_get_anticheat_initialized_hash_2 = ptr.add(0x9).rip().as<PVOID>();
 		});
 
-		main_batch.add("Anticheat Context", "8B D0 41 54", -1, -1, eGameBranch::Legacy, [this](memory::handle ptr) {
-			m_anticheat_context = ptr.sub(10).rip().as<CAnticheatContext**>();
+		main_batch.add("Anticheat Context", "69 C9 FD 43 03 00 8B D0", -1, -1, eGameBranch::Legacy, [this](memory::handle ptr) {
+			m_anticheat_context = ptr.sub(4).rip().as<CAnticheatContext**>();
 		});
 		main_batch.add("Anticheat Context", "48 8D BB 70 0A 00 00 4C 8D 35 ? ? ? ? 66 90", -1, -1, eGameBranch::Enhanced, [this](memory::handle ptr) {
 			m_anticheat_context = ptr.sub(0x12).add(3).rip().as<CAnticheatContext**>();

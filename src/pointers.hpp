@@ -24,8 +24,7 @@ namespace big
 		eGameState* m_game_state{};
 		bool* m_is_session_started{};
 
-		rage::game_skeleton* m_game_skeleton;
-		void (*m_nullsub)();
+		PVOID m_game_skeleton_update;
 
 		CPedFactory** m_ped_factory{};
 		CNetworkPlayerMgr** m_network_player_mgr{};

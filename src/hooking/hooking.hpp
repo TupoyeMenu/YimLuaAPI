@@ -26,6 +26,8 @@ namespace big
 		static std::uint32_t get_anticheat_initialized_hash();
 		static std::uint32_t get_anticheat_initialized_hash_2(void* ac_var, std::uint32_t seed);
 
+		static void game_skeleton_update(rage::game_skeleton* skeleton, int type);
+
 		static bool init_native_tables(rage::scrProgram* program);
 		static rage::eThreadState script_vm(uint64_t* start_stack, uint64_t** scr_globals, rage::scrProgram* program, rage::scrThreadContext* ctx);
 	};

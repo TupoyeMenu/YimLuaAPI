@@ -54,6 +54,7 @@ ninja
 | ------------------------------------------------------------ | ------------------------------------------------------------------------- |
 | Pocakking                                                    | [BigBaseV2](https://github.com/Pocakking/BigBaseV2)                       |
 | spankerincrease(gir489)                                      | [BigBaseV2-fix](https://bitbucket.org/gir489/bigbasev2-fix)               |
+| [Mr-X-GTA](https://github.com/Mr-X-GTA)                      | Updates for newer GTA V versions                                          |
 | [YimMenu](https://github.com/YimMenu/YimMenu) contributors   | Updates for newer GTA V versions, most of the code is stolen from them    |
 | [YimMenu](https://github.com/YimMenu/YimMenuV2) contributors | Updates for GTA V Enhanced versions, a lot of code is stolen from them    |
 | tupoy-ya                                                     | Being stupid                                                              |
