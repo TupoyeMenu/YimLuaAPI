@@ -1,10 +1,7 @@
 #include "script_mgr.hpp"
 
 #include "gta_util.hpp"
-#include "pointers.hpp"
-
-#include <script/tlsContext.hpp>
-#include <script/GtaThread.hpp>
+#include "lua/lua_manager.hpp"
 
 namespace big
 {
@@ -22,23 +19,32 @@ namespace big
 		m_scripts.clear();
 	}
 
+	void script_mgr::tick()
+	{
+		gta_util::execute_as_script(RAGE_JOAAT("main_persistent"), std::mem_fn(&script_mgr::tick_internal), this);
+	}
+
 	void script_mgr::ensure_main_fiber()
 	{
 		ConvertThreadToFiber(nullptr);
 
 		m_can_tick = true;
 	}
+
 	static void lua_manager_tick()
 	{
 		g_lua_manager->reload_changed_scripts();
 
-		g_lua_manager->for_each_module([](const std::shared_ptr<lua_module>& module) {
-			module->tick_scripts();
-			module->cleanup_done_scripts();
-		});
+		if(g_lua_manager)
+		{
+			g_lua_manager->for_each_module([](const std::shared_ptr<lua_module>& module) {
+				module->tick_scripts();
+				module->cleanup_done_scripts();
+			});
+		}
 	}
 
-	void script_mgr::tick()
+	void script_mgr::tick_internal()
 	{
 		static bool ensure_it = (ensure_main_fiber(), true);
 
