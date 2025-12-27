@@ -95,6 +95,14 @@ namespace lua::imgui
 	{
 		return ImGui::BeginChild(name.c_str(), {sizeX, sizeY}, child_flags, window_flags);
 	}
+	inline bool BeginChild(const std::string& name, float sizeX, float sizeY, bool border)
+	{
+		return ImGui::BeginChild(name.c_str(), {sizeX, sizeY}, border);
+	}
+	inline bool BeginChild(const std::string& name, float sizeX, float sizeY, bool border, int window_flags)
+	{
+		return ImGui::BeginChild(name.c_str(), {sizeX, sizeY}, border, window_flags);
+	}
 	inline void EndChild()
 	{
 		ImGui::EndChild();
@@ -435,6 +443,22 @@ namespace lua::imgui
 	inline void PopTextWrapPos()
 	{
 		ImGui::PopTextWrapPos();
+	}
+	inline void PushAllowKeyboardFocus(bool allowKeyboardFocus)
+	{
+		ImGui::PushItemFlag(ImGuiItemFlags_NoTabStop, !allowKeyboardFocus);
+	}
+	inline void PopAllowKeyboardFocus()
+	{
+		ImGui::PopItemFlag();
+	}
+	inline void PushButtonRepeat(bool repeat)
+	{
+		ImGui::PushItemFlag(ImGuiItemFlags_ButtonRepeat, repeat);
+	}
+	inline void PopButtonRepeat()
+	{
+		ImGui::PopItemFlag();
 	}
 
 	// Cursor / Layout
@@ -3629,7 +3653,13 @@ namespace lua::imgui
 #pragma endregion Windows
 
 #pragma region Child Windows
-		ImGui.set_function("BeginChild", sol::overload(sol::resolve<bool(const std::string&)>(BeginChild), sol::resolve<bool(const std::string&, float)>(BeginChild), sol::resolve<bool(const std::string&, float, float)>(BeginChild), sol::resolve<bool(const std::string&, float, float, int)>(BeginChild), sol::resolve<bool(const std::string&, float, float, int, int)>(BeginChild)));
+		ImGui.set_function("BeginChild", sol::overload(sol::resolve<bool(const std::string&)>(BeginChild),
+		 sol::resolve<bool(const std::string&, float)>(BeginChild),
+sol::resolve<bool(const std::string&, float, float)>(BeginChild),
+sol::resolve<bool(const std::string&, float, float, int)>(BeginChild),
+sol::resolve<bool(const std::string&, float, float, int, int)>(BeginChild),
+sol::resolve<bool(const std::string&, float, float, bool)>(BeginChild),
+sol::resolve<bool(const std::string&, float, float, bool, int)>(BeginChild)));
 		ImGui.set_function("EndChild", EndChild);
 #pragma endregion Child Windows
 
@@ -3700,6 +3730,10 @@ namespace lua::imgui
 		ImGui.set_function("CalcItemWidth", CalcItemWidth);
 		ImGui.set_function("PushTextWrapPos", sol::overload(sol::resolve<void()>(PushTextWrapPos), sol::resolve<void(float)>(PushTextWrapPos)));
 		ImGui.set_function("PopTextWrapPos", PopTextWrapPos);
+		ImGui.set_function("PushAllowKeyboardFocus", PushAllowKeyboardFocus);
+		ImGui.set_function("PopAllowKeyboardFocus", PopAllowKeyboardFocus);
+		ImGui.set_function("PushButtonRepeat", PushButtonRepeat);
+		ImGui.set_function("PopButtonRepeat", PopButtonRepeat);
 #pragma endregion Parameters stacks(current window)
 
 #pragma region Cursor / Layout
