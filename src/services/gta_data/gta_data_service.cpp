@@ -24,9 +24,14 @@ namespace big
 		return false;
 	}
 
+	static weapon_item empty_weapon;
+	static weapon_component empty_component;
+
 	gta_data_service::gta_data_service() :
 	    m_update_state(eGtaDataUpdateState::IDLE)
 	{
+		empty_weapon = {};
+		empty_component = {};
 	}
 
 	bool gta_data_service::init()
@@ -88,7 +93,7 @@ namespace big
 		for (const auto& [name, weapon] : m_weapons_cache.weapon_map)
 			if (weapon.m_hash == hash)
 				return weapon;
-		return gta_data_service::empty_weapon;
+		return empty_weapon;
 	}
 
 	const weapon_component& gta_data_service::weapon_component_by_hash(uint32_t hash)
@@ -96,7 +101,7 @@ namespace big
 		for (const auto& [name, component] : m_weapons_cache.weapon_components)
 			if (component.m_hash == hash)
 				return component;
-		return gta_data_service::empty_component;
+		return empty_component;
 	}
 
 	const weapon_component& gta_data_service::weapon_component_by_name(std::string name)
@@ -104,7 +109,7 @@ namespace big
 		for (const auto& [name_key, component] : m_weapons_cache.weapon_components)
 			if (name_key == name)
 				return component;
-		return gta_data_service::empty_component;
+		return empty_component;
 	}
 
 	string_vec& gta_data_service::ped_types()
@@ -275,9 +280,9 @@ namespace big
 
 		std::vector<ped_item> peds;
 		std::vector<vehicle_item> vehicles;
-		//std::vector<weapon_item_parsed> weapons;
+		//std::vector<weapon_item> weapons;
 		std::unordered_map<Hash, weapon_item_parsed> weapons;
-		std::vector<weapon_component_parsed> weapon_components;
+		std::vector<weapon_component> weapon_components;
 
 		constexpr auto exists = [](const hash_array& arr, uint32_t val) -> bool {
 			return std::find(arr.begin(), arr.end(), val) != arr.end();
@@ -354,7 +359,7 @@ namespace big
 						if (LocDesc.ends_with("INVALID"))
 							LocDesc.clear();
 
-						weapon_component_parsed component;
+						weapon_component component;
 
 						component.m_name         = name;
 						component.m_hash         = hash;

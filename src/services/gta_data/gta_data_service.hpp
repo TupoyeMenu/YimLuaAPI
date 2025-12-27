@@ -49,11 +49,11 @@ namespace big
 		{
 			return m_vehicles;
 		}
-		std::map<std::string, weapon_item_parsed>& weapons()
+		std::map<std::string, weapon_item>& weapons()
 		{
 			return m_weapons_cache.weapon_map;
 		}
-		std::map<std::string, weapon_component_parsed>& weapon_components()
+		std::map<std::string, weapon_component>& weapon_components()
 		{
 			return m_weapons_cache.weapon_components;
 		}
@@ -86,8 +86,6 @@ namespace big
 	private:
 		static constexpr ped_item empty_ped{};
 		static constexpr vehicle_item empty_vehicle{};
-		static constexpr weapon_item empty_weapon{};
-		static constexpr weapon_component empty_component{};
 	};
 
 	inline gta_data_service g_gta_data_service{};
