@@ -17,8 +17,8 @@ namespace big
 			NLOHMANN_DEFINE_TYPE_INTRUSIVE(version_info, m_game_build, m_online_version, m_file_version)
 		} version_info{};
 
-		std::map<std::string, weapon_item> weapon_map;
-		std::map<std::string, weapon_component> weapon_components;
+		std::map<std::string, weapon_item_parsed> weapon_map;
+		std::map<std::string, weapon_component_parsed> weapon_components;
 
 		NLOHMANN_DEFINE_TYPE_INTRUSIVE(weapon_file, version_info, weapon_map, weapon_components)
 

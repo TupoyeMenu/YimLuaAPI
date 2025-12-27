@@ -275,9 +275,9 @@ namespace big
 
 		std::vector<ped_item> peds;
 		std::vector<vehicle_item> vehicles;
-		//std::vector<weapon_item> weapons;
+		//std::vector<weapon_item_parsed> weapons;
 		std::unordered_map<Hash, weapon_item_parsed> weapons;
-		std::vector<weapon_component> weapon_components;
+		std::vector<weapon_component_parsed> weapon_components;
 
 		constexpr auto exists = [](const hash_array& arr, uint32_t val) -> bool {
 			return std::find(arr.begin(), arr.end(), val) != arr.end();
@@ -354,7 +354,7 @@ namespace big
 						if (LocDesc.ends_with("INVALID"))
 							LocDesc.clear();
 
-						weapon_component component;
+						weapon_component_parsed component;
 
 						component.m_name         = name;
 						component.m_hash         = hash;

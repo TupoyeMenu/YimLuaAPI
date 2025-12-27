@@ -49,11 +49,11 @@ namespace big
 		{
 			return m_vehicles;
 		}
-		std::map<std::string, weapon_item>& weapons()
+		std::map<std::string, weapon_item_parsed>& weapons()
 		{
 			return m_weapons_cache.weapon_map;
 		}
-		std::map<std::string, weapon_component>& weapon_components()
+		std::map<std::string, weapon_component_parsed>& weapon_components()
 		{
 			return m_weapons_cache.weapon_components;
 		}
