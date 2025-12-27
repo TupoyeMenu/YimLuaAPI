@@ -8,8 +8,10 @@
 #include "common.hpp"
 #include "fiber_pool.hpp"
 #include "file_manager.hpp"
+#include "gta/big_program.hpp"
 #include "gta/joaat.hpp"
 #include "hooking/hooking.hpp"
+#include "invoker.hpp"
 #include "lua/lua_manager.hpp"
 #include "native_hooks/native_hooks.hpp"
 #include "pointers.hpp"
@@ -125,6 +127,16 @@ BOOL APIENTRY DllMain(HMODULE hmod, DWORD reason, PVOID)
 				    auto hooking_instance = std::make_unique<hooking>();
 				    LOG(INFO) << "Hooking initialized.";
 
+				    while (!*g_pointers->m_natives_registered)
+					    std::this_thread::sleep_for(50ms);
+
+				    auto script_program_instance = std::make_unique<big_program>("BadAPIInternal");
+				    create_script_thread("BadAPIInternal");
+				    LOG(INFO) << "Script Program initialized.";
+
+				    g_native_invoker.cache_handlers();
+				    LOG(INFO) << "Native handlers cached.";
+
 				    auto notification_service_instance   = std::make_unique<notification_service>();
 				    auto player_service_instance         = std::make_unique<player_service>();
 				    auto script_patcher_service_instance = std::make_unique<script_patcher_service>();
@@ -190,6 +202,10 @@ BOOL APIENTRY DllMain(HMODULE hmod, DWORD reason, PVOID)
 
 				    fiber_pool_instance.reset();
 				    LOG(INFO) << "Fiber pool uninitialized.";
+
+				    destroy_script_thread();
+				    script_program_instance.reset();
+				    LOG(INFO) << "Script Program uninitialized.";
 
 #ifdef ENABLE_GUI
 				    if (g_is_enhanced)

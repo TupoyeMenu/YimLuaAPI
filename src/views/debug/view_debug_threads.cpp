@@ -11,12 +11,19 @@
 
 #ifdef ENABLE_GUI
 
+// clang-format off
+#include "util/header_wrappers/include_as_enhaced.hpp"
+#include "gta/script_thread.hpp"
+#include "util/header_wrappers/include_as_legacy.hpp"
+#include "gta/script_thread.hpp"
+#include "util/header_wrappers/clear_include.hpp"
+// clang-format on
+
 #include "core/data/all_script_names.hpp"
 #include "core/data/stack_sizes.hpp"
 #include "fiber_pool.hpp"
 #include "gta/joaat.hpp"
 #include "gta/script_handler.hpp"
-#include "gta/script_thread.hpp"
 #include "gta_util.hpp"
 #include "gui/components/components.hpp"
 #include "natives.hpp"
@@ -59,15 +66,15 @@ namespace big
 			{
 				if (script)
 				{
-					if (CROSS_CLASS_ACCESS(rage::scrThread, rage_enhanced::scrThread, script, ->m_context.m_state) != rage::eThreadState::killed && CROSS_CLASS_ACCESS(rage::scrThread, rage_enhanced::scrThread, script, ->m_context.m_stack_size) == 0)
+					if (CROSS_CLASS_ACCESS(legacy::rage::scrThread, enhanced::rage::scrThread, script, ->m_context.m_state) != rage::eThreadState::killed && CROSS_CLASS_ACCESS(legacy::rage::scrThread, enhanced::rage::scrThread, script, ->m_context.m_stack_size) == 0)
 						continue;
 
-					ImGui::PushID(CROSS_CLASS_ACCESS(rage::scrThread, rage_enhanced::scrThread, script, ->m_context.m_thread_id));
+					ImGui::PushID(CROSS_CLASS_ACCESS(legacy::rage::scrThread, enhanced::rage::scrThread, script, ->m_context.m_thread_id));
 
-					if (CROSS_CLASS_ACCESS(rage::scrThread, rage_enhanced::scrThread, script, ->m_context.m_state) == rage::eThreadState::killed)
+					if (CROSS_CLASS_ACCESS(rage::scrThread, enhanced::rage::scrThread, script, ->m_context.m_state) == rage::eThreadState::killed)
 						ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.1f, 0.1f, 1.f));
 
-					if (ImGui::Selectable(CROSS_CLASS_ACCESS(rage::scrThread, rage_enhanced::scrThread, script, ->m_name), selected_thread == script))
+					if (ImGui::Selectable(CROSS_CLASS_ACCESS(legacy::rage::scrThread, enhanced::rage::scrThread, script, ->m_name), selected_thread == script))
 					{
 						selected_thread = script;
 					}
@@ -75,7 +82,7 @@ namespace big
 					if (selected_thread == script)
 						ImGui::SetItemDefaultFocus();
 
-					if (CROSS_CLASS_ACCESS(rage::scrThread, rage_enhanced::scrThread, script, ->m_context.m_state) == rage::eThreadState::killed)
+					if (CROSS_CLASS_ACCESS(legacy::rage::scrThread, enhanced::rage::scrThread, script, ->m_context.m_state) == rage::eThreadState::killed)
 						ImGui::PopStyleColor();
 
 					ImGui::PopID();
@@ -89,24 +96,25 @@ namespace big
 
 		if (selected_thread)
 		{
-			ImGui::Combo("State", (int*)&CROSS_CLASS_ACCESS(rage::scrThread, rage_enhanced::scrThread, selected_thread, ->m_context.m_state), "RUNNING\0WAITING\0KILLED\0PAUSED\0STATE_4\0");
+			ImGui::Combo("State", (int*)&CROSS_CLASS_ACCESS(legacy::rage::scrThread, enhanced::rage::scrThread, selected_thread, ->m_context.m_state), "RUNNING\0WAITING\0KILLED\0PAUSED\0STATE_4\0");
 
 			ImGui::Text("Stack Pointer / Stack Size %d/%d",
-			    CROSS_CLASS_ACCESS(rage::scrThread, rage_enhanced::scrThread, selected_thread, ->m_context.m_stack_pointer),
-			    CROSS_CLASS_ACCESS(rage::scrThread, rage_enhanced::scrThread, selected_thread, ->m_context.m_stack_size));
-			ImGui::Text("IP: %X", CROSS_CLASS_ACCESS(rage::scrThread, rage_enhanced::scrThread, selected_thread, ->m_context.m_instruction_pointer));
-			if (CROSS_CLASS_ACCESS(rage::scrThread, rage_enhanced::scrThread, selected_thread, ->m_context.m_state) == rage::eThreadState::killed)
-				ImGui::Text("Exit Reason: %s", CROSS_CLASS_ACCESS(rage::scrThread, rage_enhanced::scrThread, selected_thread, ->m_exit_message));
+			    CROSS_CLASS_ACCESS(legacy::rage::scrThread, enhanced::rage::scrThread, selected_thread, ->m_context.m_stack_pointer),
+			    CROSS_CLASS_ACCESS(legacy::rage::scrThread, enhanced::rage::scrThread, selected_thread, ->m_context.m_stack_size));
+			ImGui::Text("IP: %X", CROSS_CLASS_ACCESS(legacy::rage::scrThread, enhanced::rage::scrThread, selected_thread, ->m_context.m_instruction_pointer));
+			if (CROSS_CLASS_ACCESS(legacy::rage::scrThread, enhanced::rage::scrThread, selected_thread, ->m_context.m_state) == rage::eThreadState::killed)
+				ImGui::Text("Exit Reason: %s", CROSS_CLASS_ACCESS(legacy::rage::scrThread, enhanced::rage::scrThread, selected_thread, ->m_exit_message));
 
 			if (ImGui::Button("Kill"))
 			{
-				if (CROSS_CLASS_ACCESS(rage::scrThread, rage_enhanced::scrThread, selected_thread, ->m_context.m_stack_size) != 0)
+				if (CROSS_CLASS_ACCESS(legacy::rage::scrThread, enhanced::rage::scrThread, selected_thread, ->m_context.m_stack_size) != 0)
 					selected_thread->kill();
 
-				CROSS_CLASS_ACCESS(rage::scrThread, rage_enhanced::scrThread, selected_thread, ->m_context.m_state) = rage::eThreadState::killed;
+				CROSS_CLASS_ACCESS(legacy::rage::scrThread, enhanced::rage::scrThread, selected_thread, ->m_context.m_state) = rage::eThreadState::killed;
 			}
 		}
 
+		
 		ImGui::Text("Start New Script");
 
 		if (ImGui::BeginCombo("Script", selected_script))

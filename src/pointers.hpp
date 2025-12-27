@@ -83,6 +83,13 @@ namespace big
 		PVOID m_get_anticheat_initialized_hash;
 		PVOID m_get_anticheat_initialized_hash_2;
 		CAnticheatContext** m_anticheat_context;
+
+		bool* m_natives_registered;
+		PVOID m_gta_thread_vtable;
+
+		uint32_t m_tls_context_allocator_offset;
+		uint32_t m_tls_context_thread_offset;
+		rage::sysMemAllocator* m_allocator;
 	};
 
 	inline pointers* g_pointers{};

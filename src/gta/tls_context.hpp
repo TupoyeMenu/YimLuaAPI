@@ -1,21 +1,36 @@
 #pragma once
-#include <intrin.h>
 
-namespace rage_enhanced
+#include "pointers.hpp"
+#if _WIN32
+#include <intrin.h>
+#endif
+
+namespace rage
 {
-	class scrThread;
-	class tlsContext
+	class badTLSContext
 	{
 	public:
-		char m_Pad1[0x7A8];
-		rage::scrThread* m_script_thread;
-		bool m_is_script_thread_active;
+		rage::sysMemAllocator* getAllocator()
+		{
+			return *(::rage::sysMemAllocator**)((intptr_t)this + big::g_pointers->m_tls_context_allocator_offset);
+		}
+		rage::sysMemAllocator** getAllocatorPtr()
+		{
+			return (::rage::sysMemAllocator**)((intptr_t)this + big::g_pointers->m_tls_context_allocator_offset);
+		}
+		void** getScriptThreadPtr()
+		{
+			return (void**)((intptr_t)this + big::g_pointers->m_tls_context_thread_offset);
+		}
+		bool* getScriptThreadActivePtr()
+		{
+			return (bool*)((intptr_t)this + big::g_pointers->m_tls_context_thread_offset + sizeof(void*));
+		}
 
-		static tlsContext* get()
+		static badTLSContext* get()
 		{
 			constexpr std::uint32_t TlsIndex = 0x0;
-			return *reinterpret_cast<tlsContext**>(__readgsqword(0x58) + TlsIndex);
+			return *reinterpret_cast<badTLSContext**>(__readgsqword(0x58) + TlsIndex);
 		}
 	};
-	static_assert(sizeof(tlsContext) == 0x7B8);
 }

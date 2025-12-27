@@ -140,14 +140,14 @@ namespace big
 			{
 				if (SymGetLineFromAddr64(GetCurrentProcess(), addr, &displacement, &line))
 				{
-					m_dump << line.FileName << " L: " << line.LineNumber << ' ' << std::string_view(symbol->Name, symbol->NameLen);
+					m_dump << line.FileName << " L: " << line.LineNumber << ' ' << std::string_view(symbol->Name, symbol->NameLen) << ' ' << HEX_TO_UPPER(addr);
 
 					continue;
 				}
 				
 				if (module_info)
 				{
-					m_dump << module_info->m_name << ' ' << std::string_view(symbol->Name, symbol->NameLen);
+					m_dump << module_info->m_name << '+' << HEX_TO_UPPER(addr - module_info->m_base) << ' ' << std::string_view(symbol->Name, symbol->NameLen) << ' ' << HEX_TO_UPPER(addr);
 
 					continue;
 				}
@@ -170,7 +170,8 @@ namespace big
 
 	void stack_trace::dump_script_info()
 	{
-		m_dump << "Currently executing script: " << CROSS_CLASS_ACCESS(rage::tlsContext, rage_enhanced::tlsContext, rage::tlsContext::get(), ->m_script_thread->m_name) << '\n';
+		void* thread = *rage::badTLSContext::get()->getScriptThreadPtr();
+		m_dump << "Currently executing script: " << CROSS_CLASS_ACCESS(legacy::rage::scrThread, enhanced::rage::scrThread, thread, ->m_name) << '\n';
 		m_dump << "Thread program counter (could be inaccurate): "
 		       << m_totally_not_exception_info->ContextRecord->Rdi - m_totally_not_exception_info->ContextRecord->Rsi << '\n';
 	}

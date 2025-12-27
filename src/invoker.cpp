@@ -5,10 +5,12 @@
 #include "invoker.hpp"
 
 #include "crossmap.hpp"
+#include "gta/big_program.hpp"
 #include "hooking/hooking.hpp"
 #include "pointers.hpp"
 #include "script/scrNativeHandler.hpp"
 #include "script/scrProgram.hpp"
+#include "gta/tls_context.hpp"
 
 namespace big
 {
@@ -29,11 +31,9 @@ namespace big
 			m_handler_cache[i] = (rage::scrNativeHandler)mapping.second;
 			++i;
 		}
-		auto program = reinterpret_cast<rage::scrProgram*>(calloc(1, sizeof(rage::scrProgram)));
-		program->m_native_count = m_handler_cache.size();
-		program->m_native_entrypoints = m_handler_cache.data();
-		g_hooking->get_original<hooks::init_native_tables>()(program);
-		free(program);
+		g_main_program->m_native_count = m_handler_cache.size();
+		g_main_program->m_native_entrypoints = m_handler_cache.data();
+		g_hooking->get_original<hooks::init_native_tables>()(g_main_program);
 
 		m_handlers_cached = true;
 	}
@@ -66,7 +66,13 @@ namespace big
 
 	void native_invoker::begin_call()
 	{
+		m_thread_lock.lock();
+
+		if (m_call_started)
+			LOG(FATAL) << "Began native call while another call was in process, did you forget to call end_call?";
+
 		m_call_context.reset();
+		m_call_started = true;
 	}
 
 	void native_invoker::end_call(rage::scrNativeHash hash)
@@ -82,13 +88,31 @@ namespace big
 		{
 			rage::scrNativeHandler handler = m_handler_cache.at(i);
 
+			auto tls_ctx = rage::badTLSContext::get();
+			void* og_thread = *tls_ctx->getScriptThreadPtr();
+			bool og_thread_running = *tls_ctx->getScriptThreadActivePtr();
+			if (!og_thread)
+			{
+				*tls_ctx->getScriptThreadPtr() = g_main_script_thread;
+				*tls_ctx->getScriptThreadActivePtr() = true;
+			}
+
 			// return address checks are no longer a thing
 			handler(&m_call_context);
 			fix_vectors(m_call_context);
+
+			if (!og_thread)
+			{
+				*tls_ctx->getScriptThreadPtr() = og_thread;
+				*tls_ctx->getScriptThreadActivePtr() = og_thread_running;
+			}
 		}
 		catch(const std::out_of_range& ex)
 		{
 			LOG(WARNING) << "Failed to find " << HEX_TO_UPPER(hash) << " native's handler.";
 		}
+
+		m_call_started = false;
+		m_thread_lock.unlock();
 	}
 }

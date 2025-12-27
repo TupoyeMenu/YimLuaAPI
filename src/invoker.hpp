@@ -10,6 +10,7 @@
 
 #pragma once
 #include "crossmap.hpp"
+#include <mutex>
 #include <script/scrNativeHandler.hpp>
 
 namespace big
@@ -57,6 +58,10 @@ namespace big
 		native_call_context m_call_context;
 		static inline std::array<rage::scrNativeHandler, sizeof(g_crossmap) / sizeof(rage::scrNativePair)> m_handler_cache;
 		bool m_handlers_cached = false;
+		bool m_call_started = false;
+	
+	private:
+		std::mutex m_thread_lock;
 	};
 
 	inline native_invoker g_native_invoker;
