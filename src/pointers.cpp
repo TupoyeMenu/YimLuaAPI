@@ -166,6 +166,27 @@ namespace big
 			m_anticheat_context = ptr.sub(0x12).add(3).rip().as<CAnticheatContext**>();
 		});
 
+		main_batch.add("Ped Pool", "4C 8B 35 ? ? ? ? B8", -1, -1, eGameBranch::Legacy, [this](memory::handle ptr) {
+			m_ped_pool = ptr.add(3).rip().as<void**>();
+		});
+		main_batch.add("Ped Pool", "80 79 4B 00 0F 84 F5 00 00 00 48 89 F1", -1, -1, eGameBranch::Enhanced, [this](memory::handle ptr) {
+			m_ped_pool = ptr.add(0x18).add(3).rip().as<void**>();
+		});
+
+		main_batch.add("Prop Pool", "48 8B 05 ? ? ? ? 0F B7 50 10 48 8B 05", -1, -1, eGameBranch::Legacy, [this](memory::handle ptr) {
+			m_prop_pool = ptr.add(3).rip().as<void**>();
+		});
+		main_batch.add("Prop Pool", "48 8B 04 0A C3 0F B6 05", -1, -1, eGameBranch::Enhanced, [this](memory::handle ptr) {
+			m_prop_pool = ptr.add(5).add(3).rip().as<void**>();
+		});
+
+		main_batch.add("Vehicle Pool", "4C 8B 25 ? ? ? ? 8B 29", -1, -1, eGameBranch::Legacy, [this](memory::handle ptr) {
+			m_vehicle_pool = ptr.add(3).rip().as<void***>();
+		});
+		main_batch.add("Vehicle Pool", "48 83 78 18 0D", -1, -1, eGameBranch::Enhanced, [this](memory::handle ptr) {
+			m_vehicle_pool = ptr.sub(0xA).add(3).rip().as<void***>();
+		});
+
 		main_batch.add("Give Pickup Reward", "48 8B C8 33 C0 48 85 C9 74 0A 44 8B C3 8B D7 E8", -1, -1, eGameBranch::Legacy, [this](memory::handle ptr) {
 			m_give_pickup_rewards = ptr.sub(0x28).as<decltype(m_give_pickup_rewards)>();
 		});
