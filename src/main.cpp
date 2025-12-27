@@ -153,7 +153,6 @@ BOOL APIENTRY DllMain(HMODULE hmod, DWORD reason, PVOID)
 				        std::make_unique<lua_manager>(g_file_manager.get_project_folder("scripts"), g_file_manager.get_project_folder("scripts_config"));
 				    LOG(INFO) << "Lua manager initialized.";
 
-
 				    while (g_running)
 					    std::this_thread::sleep_for(500ms);
 

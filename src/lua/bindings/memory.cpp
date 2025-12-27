@@ -79,7 +79,10 @@ namespace lua::memory
 	// Scans the specified memory pattern within the "GTA5.exe" module and returns a pointer to the found address.
 	static pointer scan_pattern(const std::string& pattern)
 	{
-		return pointer(::memory::module("").scan(::memory::pattern(pattern)).value().as<uint64_t>());
+		auto ptr = ::memory::module("").scan(::memory::pattern(pattern));
+		if (!ptr.has_value())
+			LOG(FATAL) << "Failed to find " << pattern;
+		return pointer(ptr.has_value() ? ptr.value().as<uint64_t>() : 0);
 	}
 
 	// Lua API: Function
