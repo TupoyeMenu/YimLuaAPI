@@ -112,7 +112,7 @@ namespace big
 			m_swapchain     = ptr.add(0x21).add(3).rip().as<IDXGISwapChain**>();
 		});
 
-		main_batch.add("Model Spawn Bypass", "48 8B C8 FF 52 30 84 C0 ? 05 48", -1, -1, eGameBranch::Legacy, [this](memory::handle ptr) {
+		main_batch.add("Model Spawn Bypass", "48 8B C8 FF 52 30 84 C0 ? ? 48 8B C3", -1, -1, eGameBranch::Legacy, [this](memory::handle ptr) {
 			m_model_spawn_bypass =
 			    memory::byte_patch::make(ptr.add(8).as<PVOID>(), std::to_array<uint8_t>({0x90, 0x90})).get();
 		});
@@ -166,8 +166,11 @@ namespace big
 			m_queue_packet = ptr.add(4).rip().as<functions::queue_packet>();
 		});
 
-		main_batch.add("Get Net Object", "48 89 5C 24 08 48 89 6C 24 10 48 89 74 24 18 57 41 54 41 55 41 56 41 57 48 83 EC 40 4C 8B EA", -1, -1, eGameBranch::Legacy, [this](memory::handle ptr) {
-			m_get_net_object = ptr.add(0x109).add(1).rip().as<decltype(pointers::m_get_net_object)>(); // E8 ? ? ? ? 0F B7 53 7C .add(1).rip().as()
+		main_batch.add("Get Net Object", "E8 ? ? ? ? 0F B7 53 7C", -1, -1, eGameBranch::Legacy, [this](memory::handle ptr) {
+			m_get_net_object = ptr.add(1).rip().as<decltype(pointers::m_get_net_object)>();
+		});
+		main_batch.add("Get Net Object", "0F B7 57 ? 45 31 C0 E8 ? ? ? ? 48 89 C7 48 89 D9", -1, -1, eGameBranch::Enhanced, [this](memory::handle ptr) {
+			m_get_net_object = ptr.add(8).rip().as<decltype(pointers::m_get_net_object)>();
 		});
 
 		main_batch.add("Request Control", "E8 ? ? ? ? EB 50 48 8B D3", -1, -1, eGameBranch::Legacy, [this](memory::handle ptr) {
