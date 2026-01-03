@@ -51,7 +51,7 @@ namespace lua::global_table
 		});
 
 		state["FAKE_YIMAPI"] = true;
-		state["get_game_branch"] = big::get_game_branch();
+		state["get_game_branch"] = big::get_game_branch;
 		state["joaat"] = rage::joaat;
 	}
 }
