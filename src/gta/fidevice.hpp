@@ -8,11 +8,9 @@
  * You should have received a copy of the GNU General Public License along with YimMenu. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
-#include "pointers.hpp"
+#if !FI_DEVICE_HPP_LEGACY || !FI_DEVICE_HPP_ENHANCED
 
-#include <array>
-
+#if !FI_DEVICE_HPP_LEGACY && !FI_DEVICE_HPP_ENHANCED
 namespace rage
 {
 	struct fiFindData
@@ -29,7 +27,24 @@ namespace rage
 		uint32_t flag1;
 		uint32_t flag2;
 	};
+}
+#endif
 
+	#if ENHANCED
+		#define FI_DEVICE_HPP_ENHANCED 1
+	#else
+		#define FI_DEVICE_HPP_LEGACY 1
+	#endif
+
+	#include "pointers.hpp"
+
+	#include <array>
+
+namespace GAME_BRANCH
+{
+namespace rage
+{
+	using namespace ::rage;
 	// since Payne, RAGE devices are thread-safe (might not apply to V?)
 	// in V, RAGE devices use UTF-8
 	class fiDevice
@@ -75,7 +90,9 @@ namespace rage
 		virtual bool m_xz()                                                                     = 0;
 		virtual bool SetFileAttributes(const char* file, uint32_t FileAttributes)               = 0;
 		virtual int m_yx()                                                                      = 0;
-		virtual int m_yx2()                                                                     = 0; // FIXME: For some reason this is duplicated on enhanced.
+#if ENHANCED
+		virtual int m_yx2()                                                                     = 0;
+#endif
 		virtual bool ReadFull(uint64_t handle, void* buffer, uint32_t length)                   = 0;
 		virtual bool WriteFull(uint64_t handle, void* buffer, uint32_t length)                  = 0;
 		virtual int32_t GetResourceVersion(const char* fileName, ResourceFlags* flags)          = 0;
@@ -131,7 +148,9 @@ namespace rage
 		virtual bool m_xz();
 		virtual bool SetFileAttributes(const char* file, uint32_t FileAttributes);
 		virtual int m_yx();
+#if ENHANCED
 		virtual int m_yx2();
+#endif
 		// read even if read() returns less than length
 		virtual bool ReadFull(uint64_t handle, void* buffer, uint32_t length);
 		virtual bool WriteFull(uint64_t handle, void* buffer, uint32_t length);
@@ -166,3 +185,6 @@ namespace rage
 		void ClosePackfile();
 	};
 }
+}
+
+#endif

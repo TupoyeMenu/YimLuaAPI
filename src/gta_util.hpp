@@ -19,6 +19,9 @@
 #define CROSS_CLASS_ACCESS(legacy_type, enhanced_type, variable, expression) \
 	(g_is_enhanced ? ((enhanced_type*)variable)expression : ((legacy_type*)variable)expression)
 
+#define AUTO_CROSS_ACCESS(type, variable, expression) \
+	(g_is_enhanced ? ((enhanced::type*)variable)expression : ((legacy::type*)variable)expression)
+
 namespace big::gta_util
 {
 	inline CPed* get_local_ped()

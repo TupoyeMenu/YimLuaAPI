@@ -7,7 +7,6 @@
 
 #include "common.hpp"
 #include "function_types.hpp"
-#include "gta/script_thread.hpp"
 #include "memory/module.hpp"
 #include "natives.hpp"
 #include "pointers.hpp"

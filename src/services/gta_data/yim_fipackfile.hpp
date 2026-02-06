@@ -10,7 +10,7 @@
 
 #pragma once
 #include <pugixml.hpp>
-#include <gta/fidevice.hpp>
+#include "gta/fwddec.hpp"
 
 namespace big
 {

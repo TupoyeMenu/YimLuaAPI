@@ -10,7 +10,15 @@
 
 #include "yim_fipackfile.hpp"
 
+// clang-format off
+#include "util/header_wrappers/include_as_enhaced.hpp"
 #include "gta/fidevice.hpp"
+#include "util/header_wrappers/include_as_legacy.hpp"
+#include "gta/fidevice.hpp"
+#include "util/header_wrappers/clear_include.hpp"
+// clang-format on
+
+#include "gta_util.hpp"
 #include "util/string_conversions.hpp"
 
 namespace big
@@ -26,7 +34,7 @@ namespace big
 		m_wrapper_call_back.push_back(cb);
 	}
 
-	static bool safe_open_pack_file(rage::fiPackfile& packfile, const std::u8string& path)
+	static bool safe_open_pack_file(rage::fiPackfile* packfile, const std::u8string& path)
 	{
 		bool success = false;
 
@@ -34,7 +42,7 @@ namespace big
 		__try
 		{
 #endif // _MSC_VER
-			success = packfile.OpenPackfile(reinterpret_cast<const char*>(path.c_str()), true, 0, 0);
+			success = AUTO_CROSS_ACCESS(rage::fiPackfile, packfile, ->OpenPackfile(reinterpret_cast<const char*>(path.c_str()), true, 0, 0));
 #ifdef _MSC_VER
 		}
 		__except (EXCEPTION_EXECUTE_HANDLER)
@@ -50,8 +58,8 @@ namespace big
 	{
 		std::string mount_path = std::format("temp{}:/", depth);
 
-		rage::fiPackfile packfile;
-		if (!safe_open_pack_file(packfile, path))
+		legacy::rage::fiPackfile packfile;
+		if (!safe_open_pack_file((rage::fiPackfile*)&packfile, path))
 		{
 			LOG(INFO) << "Failed opening " << reinterpret_cast<const char*>(path.c_str());
 			return;
@@ -59,19 +67,19 @@ namespace big
 
 		packfile.Mount(mount_path.c_str());
 
-		yim_fipackfile rpf_wrapper = yim_fipackfile(&packfile, mount_path);
+		yim_fipackfile rpf_wrapper = yim_fipackfile((rage::fiPackfile*)&packfile, mount_path);
 
 		const auto files = rpf_wrapper.get_file_paths();
 		for (const auto& file : files)
 		{
 			if (file.extension() == ".rpf")
 			{
-				if (auto handle = ((rage::fiDevice*)&packfile)->Open(reinterpret_cast<const char*>(file.u8string().c_str()), true))
+				if (auto handle = (AUTO_CROSS_ACCESS(rage::fiDevice, &packfile, ->Open(reinterpret_cast<const char*>(file.u8string().c_str()), true))))
 				{
 					uint32_t encryption_type{};
-					((rage::fiDevice*)&packfile)->Seek(handle, 12, 0);
-					((rage::fiDevice*)&packfile)->Read(handle, &encryption_type, 4);
-					((rage::fiDevice*)&packfile)->Close(handle);
+					AUTO_CROSS_ACCESS(rage::fiDevice, &packfile, ->Seek(handle, 12, 0));
+					AUTO_CROSS_ACCESS(rage::fiDevice, &packfile, ->Read(handle, &encryption_type, 4));
+					AUTO_CROSS_ACCESS(rage::fiDevice, &packfile, ->Close(handle));
 
 					if (encryption_type == 0xFFFFFF9)
 						continue; // skip AES encrypted RPFs
@@ -174,7 +182,7 @@ namespace big
 		std::vector<std::string> directories;
 
 		rage::fiFindData findData = {0};
-		auto handlef              = rpf->FindFirst(parent.c_str(), &findData);
+		auto handlef              = AUTO_CROSS_ACCESS(rage::fiPackfile, rpf, ->FindFirst(parent.c_str(), &findData));
 		if (handlef != -1)
 		{
 			do
@@ -194,9 +202,9 @@ namespace big
 				{
 					file_paths.push_back(fn);
 				}
-			} while (rpf->FindNext(handlef, &findData));
+			} while (AUTO_CROSS_ACCESS(rage::fiPackfile, rpf, ->FindNext(handlef, &findData)));
 
-			rpf->FindClose(handlef);
+			AUTO_CROSS_ACCESS(rage::fiPackfile, rpf, ->FindClose(handlef));
 		}
 
 		for (auto& directory : directories)
@@ -211,21 +219,21 @@ namespace big
 
 	const char* yim_fipackfile::get_name()
 	{
-		return rpf->GetName();
+		return AUTO_CROSS_ACCESS(rage::fiPackfile, rpf, ->GetName());
 	}
 
 	void yim_fipackfile::read_file(const std::filesystem::path& path, file_contents_callback&& cb)
 	{
-		if (const auto handle = rpf->Open(path.string().c_str(), true); handle != -1)
+		if (const auto handle = AUTO_CROSS_ACCESS(rage::fiPackfile, rpf, ->Open(path.string().c_str(), true)); handle != -1)
 		{
-			const auto data_length  = rpf->GetFileLength(handle);
+			const auto data_length  = AUTO_CROSS_ACCESS(rage::fiPackfile, rpf, ->GetFileLength(handle));
 			const auto file_content = std::make_unique<uint8_t[]>(data_length);
 
-			rpf->ReadFull(handle, file_content.get(), data_length);
+			AUTO_CROSS_ACCESS(rage::fiPackfile, rpf, ->ReadFull(handle, file_content.get(), data_length));
 
 			cb(file_content, data_length);
 
-			rpf->Close(handle);
+			AUTO_CROSS_ACCESS(rage::fiPackfile, rpf, ->Close(handle));
 		}
 	}
 
