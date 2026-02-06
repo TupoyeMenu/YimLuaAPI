@@ -2,8 +2,23 @@
 A standalone YimMenu lua runtime for Legacy/Enhanced.
 Strictly for educational purposes.
 
+## Usage
+1. Inject YimLuaAPI without YimMenu(V2) and load into Single Player
+2. Press insert, go to debug -> GTA Cache -> Rebuild Cache
+3. Wait for it to build the cache
+4. Close the game
+5. Restart inject YimLuaAPI and YimMenu(V2)
+
+You only need to do steps 1-4 once.
+
+> [!CAUTION]
+> This does **NOT** bypass the Anti-Cheat!
+> You must inject YimMenu or YimMenuV2 to join online.
+
+
 ## API Changes
 This API is not 1 to 1 compatible with YimMenu's but it's pretty close.
+
 
 ### Missing features
 - `network.set_player_coords` Only works on local player
@@ -17,20 +32,6 @@ This API is not 1 to 1 compatible with YimMenu's but it's pretty close.
 - `network.force_script_on_player` Complains about not being implemented, then does nothing
 - `network.send_chat_message` Complains about not being implemented, then does nothing
 - `network.send_chat_message_to_player` Complains about not being implemented, then does nothing
-- `vehicles.get_vehicle_display_name` Return an empty string
-- `vehicles.get_vehicle_display_name_string` Return an empty string
-- `vehicles.get_all_vehicles_by_class` Return an empty table
-- `vehicles.get_all_vehicles_by_mfr` Return an empty table
-- `weapons.get_weapon_display_name` Return an empty string
-- `weapons.get_weapon_display_name_string` Return an empty string
-- `weapons.get_all_weapons_of_group_type` Return an empty table
-- `weapons.get_all_weapons_of_group_type_string` Return an empty table
-- `weapons.get_all_weapon_components` Return an empty table
-- `weapons.get_all_weapon_components_string` Return an empty table
-- `weapons.get_weapon_component_display_name` Return an empty string
-- `weapons.get_weapon_component_display_name_string` Return an empty string
-- `weapons.get_weapon_component_display_desc` Return an empty string
-- `weapons.get_weapon_component_display_desc_string` Return an empty string
 - `script.start_launcher_script` Complains about not being implemented, then does nothing
 
 ### API Extentions
