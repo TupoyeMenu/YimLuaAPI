@@ -13,6 +13,7 @@
 #include "hooking/hooking.hpp"
 #include "invoker.hpp"
 #include "lua/lua_manager.hpp"
+#include "native_hooks/native_hooks.hpp"
 #include "pointers.hpp"
 #include "script_mgr.hpp"
 #include "security/ObfVar.hpp"
@@ -148,6 +149,9 @@ BOOL APIENTRY DllMain(HMODULE hmod, DWORD reason, PVOID)
 				    g_hooking->enable();
 				    LOG(INFO) << "Hooking enabled.";
 
+				    auto native_hooks_instance = std::make_unique<native_hooks>();
+				    LOG(INFO) << "Dynamic native hooker initialized.";
+
 				    auto lua_manager_instance =
 				        std::make_unique<lua_manager>(g_file_manager.get_project_folder("scripts"), g_file_manager.get_project_folder("scripts_config"));
 				    LOG(INFO) << "Lua manager initialized.";
@@ -184,6 +188,9 @@ BOOL APIENTRY DllMain(HMODULE hmod, DWORD reason, PVOID)
 
 				    hooking_instance.reset();
 				    LOG(INFO) << "Hooking uninitialized.";
+
+				    native_hooks_instance.reset();
+				    LOG(INFO) << "Dynamic native hooker uninitialized.";
 
 				    fiber_pool_instance.reset();
 				    LOG(INFO) << "Fiber pool uninitialized.";

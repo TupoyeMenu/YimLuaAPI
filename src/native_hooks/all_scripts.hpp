@@ -1,5 +1,5 @@
 /**
- * @file init_native_tables.cpp
+ * @file all_scripts.hpp
  * 
  * @copyright GNU General Public License Version 2.
  * This file is part of YimMenu.
@@ -8,23 +8,30 @@
  * You should have received a copy of the GNU General Public License along with YimMenu. If not, see <https://www.gnu.org/licenses/>.
  */
 
+#pragma once
+#include "fiber_pool.hpp"
+#include "gta/enums.hpp"
 #include "hooking/hooking.hpp"
-#include "native_hooks/native_hooks.hpp"
-#include "services/script_patcher/script_patcher_service.hpp"
+#include "native_hooks.hpp"
+#include "natives.hpp"
+#include "util/scripts.hpp"
 
 namespace big
 {
-	bool hooks::init_native_tables(rage::scrProgram* program)
+	namespace all_scripts
 	{
-		bool ret = g_hooking->get_original<hooks::init_native_tables>()(program);
-
-		// Don't hook empty threads from cache_handlers to avoid co-loading issues.
-		if(program->m_code_blocks && program->m_code_size)
+		void RETURN_TRUE(rage::scrNativeCallContext* src)
 		{
-			g_script_patcher_service->on_script_load(program);
-			g_native_hooks->hook_program(program);
+			src->set_return_value<BOOL>(TRUE);
 		}
 
-		return ret;
+		void RETURN_FALSE(rage::scrNativeCallContext* src)
+		{
+			src->set_return_value<BOOL>(FALSE);
+		}
+
+		void DO_NOTHING(rage::scrNativeCallContext* src)
+		{
+		}
 	}
 }
