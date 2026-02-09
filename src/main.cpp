@@ -156,6 +156,8 @@ BOOL APIENTRY DllMain(HMODULE hmod, DWORD reason, PVOID)
 				    g_hooking->enable();
 				    LOG(INFO) << "Hooking enabled.";
 
+				    g_gta_data_service.init();
+
 				    auto native_hooks_instance = std::make_unique<native_hooks>();
 				    LOG(INFO) << "Dynamic native hooker initialized.";
 
