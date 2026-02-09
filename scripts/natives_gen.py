@@ -309,6 +309,13 @@ def generate_native_binding_cpp_and_hpp_files(functions_per_namespaces):
             i += 1
             file_buffer += "\t\t"+ namespace_name+ '.set_function("'+ native_func.lua_name+ '", '+ "LUA_NATIVE_"+ native_func.namespace+ "_"+ native_func.lua_name+ ");\n"
 
+        if namespace_name == "BUILTIN":
+            file_buffer +=  '\t\tL["SYSTEM"] = L["' + namespace_name + '"];\n'
+        if namespace_name == "EXTRAMETADATA":
+            file_buffer +=  '\t\tL["FILES"] = L["' + namespace_name + '"];\n'
+        if namespace_name == "LOBBY":
+            file_buffer +=  '\t\tL["LOADINGSCREEN"] = L["' + namespace_name + '"];\n'
+
         file_buffer+= "\t}\n" 
         file_buffer+= "}\n"
 
