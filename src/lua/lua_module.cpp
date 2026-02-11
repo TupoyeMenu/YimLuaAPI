@@ -1,4 +1,4 @@
-#include "lua_module.hpp"
+﻿#include "lua_module.hpp"
 
 #include "bindings/command.hpp"
 #include "bindings/entities.hpp"
@@ -85,11 +85,11 @@ namespace big
 	}
 
 	lua_module::lua_module(const std::filesystem::path& module_path, folder& scripts_folder, bool disabled) :
-	    m_state(),
-	    m_module_path(module_path),
-	    m_module_name(module_path.filename().string()),
-	    m_module_id(rage::joaat(m_module_name)),
-	    m_disabled(disabled)
+		m_state(),
+		m_module_path(module_path),
+		m_module_name(module_path.filename().string()),
+		m_module_id(rage::joaat(m_module_name)),
+		m_disabled(disabled)
 	{
 		if (!m_disabled)
 		{
@@ -163,6 +163,15 @@ namespace big
 		return m_disabled;
 	}
 
+	const std::filesystem::path lua_module::get_config_folder() const
+	{
+		const auto config_path = g_lua_manager->get_scripts_config_folder().get_path() / m_module_name;
+		if (!std::filesystem::exists(config_path))
+			std::filesystem::create_directories(config_path);
+
+		return config_path;
+	}
+
 	void lua_module::set_folder_for_lua_require(folder& scripts_folder)
 	{
 		std::string scripts_search_path = scripts_folder.get_path().string() + "/?.lua;";
@@ -183,19 +192,6 @@ namespace big
 		m_state["package"]["path"] = scripts_search_path;
 	}
 
-	void lua_module::sandbox_lua_os_library()
-	{
-		const auto& os = m_state["os"];
-		sol::table sandbox_os(m_state, sol::create);
-
-		sandbox_os["clock"]    = os["clock"];
-		sandbox_os["date"]     = os["date"];
-		sandbox_os["difftime"] = os["difftime"];
-		sandbox_os["time"]     = os["time"];
-
-		m_state["os"] = sandbox_os;
-	}
-
 	static std::optional<std::filesystem::path> make_absolute(const std::filesystem::path& root, const std::filesystem::path& user_path)
 	{
 		auto final_path = std::filesystem::weakly_canonical(root / user_path);
@@ -207,6 +203,32 @@ namespace big
 
 		return final_path;
 	};
+
+	void lua_module::sandbox_lua_os_library()
+	{
+		const auto& os = m_state["os"];
+		sol::table sandbox_os(m_state, sol::create);
+
+		sandbox_os["clock"]    = os["clock"];
+		sandbox_os["date"]     = os["date"];
+		sandbox_os["difftime"] = os["difftime"];
+		sandbox_os["time"]     = os["time"];
+		sandbox_os["rename"]   = [this](const std::string& oldname, const std::string& newname) -> sol::object {
+			const auto old_path = make_absolute(get_config_folder(), oldname);
+			const auto new_path = make_absolute(get_config_folder(), newname);
+			try
+			{
+				std::filesystem::rename(old_path.value(), new_path.value());
+				return sol::make_object(m_state, true);
+			}
+			catch (const std::exception& e)
+			{
+				return sol::make_object(m_state, std::make_tuple(sol::lua_nil, e.what()));
+			}
+		};
+
+		m_state["os"] = sandbox_os;
+	}
 
 	void lua_module::sandbox_lua_io_library()
 	{
@@ -220,7 +242,7 @@ namespace big
 		// Table for file manipulation. Modified for security purposes.
 
 		sandbox_io["open"] = [this](const std::string& filename, const std::string& mode) {
-			const auto scripts_config_sub_path = make_absolute(g_lua_manager->get_scripts_config_folder().get_path(), filename);
+			const auto scripts_config_sub_path = make_absolute(get_config_folder(), filename);
 			if (!scripts_config_sub_path)
 			{
 				LOG(WARNING) << "io.open is restricted to the scripts_config folder, and the filename provided (" << filename << ") is outside of it.";
@@ -243,8 +265,8 @@ namespace big
 		// Name: exists
 		// Param: filename: string
 		// Returns: boolean: exists: True if the passed file path exists
-		sandbox_io["exists"] = [](const std::string& filename) -> bool {
-			const auto scripts_config_sub_path = make_absolute(g_lua_manager->get_scripts_config_folder().get_path(), filename);
+		sandbox_io["exists"] = [this](const std::string& filename) -> bool {
+			const auto scripts_config_sub_path = make_absolute(get_config_folder(), filename);
 			if (!scripts_config_sub_path)
 			{
 				LOG(WARNING) << "io.open is restricted to the scripts_config folder, and the filename provided (" << filename << ") is outside of it.";
