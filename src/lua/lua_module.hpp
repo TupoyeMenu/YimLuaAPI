@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "../script.hpp"
 #include "bindings/gui.hpp"
 #include "bindings/gui/gui_element.hpp"
@@ -58,6 +58,7 @@ namespace big
 
 		// used for sandboxing and limiting to only our custom search path for the lua require function
 		void set_folder_for_lua_require(folder& scripts_folder);
+		const std::filesystem::path get_config_folder() const;
 
 		void sandbox_lua_os_library();
 		void sandbox_lua_io_library();
