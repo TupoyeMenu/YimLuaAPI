@@ -136,5 +136,5 @@ namespace big
 		}
 	};
 
-	inline lua_manager* g_lua_manager;
+	inline lua_manager* g_lua_manager = nullptr;
 }
