@@ -9,17 +9,23 @@
  */
 
 #include "script_local.hpp"
+#include "gta_util.hpp"
 
-#include "common.hpp"
+// clang-format off
+#include "util/header_wrappers/include_as_enhaced.hpp"
 #include "gta/script_thread.hpp"
-#include "pointers.hpp"
+#include "util/header_wrappers/include_as_legacy.hpp"
+#include "gta/script_thread.hpp"
+#include "util/header_wrappers/clear_include.hpp"
+// clang-format on
+
 
 namespace big
 {
 	script_local::script_local(rage::scrThread* thread, std::size_t index) :
-	    m_index(index),
-	    m_stack(thread->m_stack)
+	    m_index(index)
 	{
+		m_stack = AUTO_CROSS_ACCESS(rage::scrThread, thread, ->m_stack);
 	}
 	script_local::script_local(PVOID stack, std::size_t index) :
 	    m_index(index),

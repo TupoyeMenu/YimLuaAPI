@@ -10,7 +10,7 @@ namespace lua::locals
 		static std::remove_pointer_t<T> null{};
 		auto thread = big::gta_util::find_script_thread(rage::joaat(script));
 		if (thread)
-			return big::script_local(thread->m_stack, index).as<T>();
+			return big::script_local(thread, index).as<T>();
 
 		return &null;
 	}
