@@ -1517,23 +1517,6 @@ enum class eNetObjType
 	NET_OBJ_TYPE_TRAIN
 };
 
-constexpr const auto net_object_type_strs = std::to_array({
-    "AUTOMOBILE",
-    "BIKE",
-    "BOAT",
-    "DOOR",
-    "HELI",
-    "OBJECT",
-    "PED",
-    "PICKUP",
-    "PICKUP_PLACEMENT",
-    "PLANE",
-    "SUBMARINE",
-    "PLAYER",
-    "TRAILER",
-    "TRAIN",
-});
-
 enum class eNetObjectFlags : uint16_t
 {
 	NET_OBJ_FLAGS_FROM_SCRIPT = 1 << 2,
